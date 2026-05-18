@@ -5,14 +5,17 @@ import tensorflow as tf
 import time
 from music21 import instrument, note, stream, chord
 
-# Import our custom network builder
+import argparse
 from model import create_network
 
-# Temperature / creativity control (default value: 1.0)
-# Low temperature (0.5) = more predictable music
-# High temperature (1.5) = more creative/random music
-TEMPERATURE = float(os.environ.get("TEMPERATURE", 1.0))
-NOTE_COUNT = int(os.environ.get("NOTE_COUNT", 500))
+# Set up argument parser
+parser = argparse.ArgumentParser(description="Generate music with the trained model.")
+parser.add_argument("--temperature", type=float, default=1.0, help="Temperature / creativity control")
+parser.add_argument("--notes", type=int, default=500, help="Number of notes to generate")
+args = parser.parse_args()
+
+TEMPERATURE = args.temperature
+NOTE_COUNT = args.notes
 
 def generate_music():
     """ 
