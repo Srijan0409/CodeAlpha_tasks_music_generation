@@ -107,4 +107,4 @@ Built as Task 3 of the Code Alpha Internship Program. Demonstrates applied deep 
 ## Author & License
 
 Developed for the Code Alpha Internship.
-This project is licensed under the MIT License.
+This project is licensed under  MIT License.
