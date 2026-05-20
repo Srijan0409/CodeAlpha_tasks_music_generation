@@ -9,8 +9,8 @@ An LSTM-based deep learning system that composes original music from MIDI traini
 
 ## Demo
 
-![App Preview](placeholder.gif)
-*(replace with screenshot of app.py)*
+<img width="1918" height="841" alt="Screenshot 2026-05-17 233028" src="https://github.com/user-attachments/assets/bd1cff61-30e2-4901-8ad1-7a7f464e1b81" />
+
 
 ## Features
 
@@ -107,4 +107,4 @@ Built as Task 3 of the Code Alpha Internship Program. Demonstrates applied deep 
 ## Author & License
 
 Developed for the Code Alpha Internship.
-This project is licensed under  MIT License.
+This project is licensed under the MIT License.
