@@ -10,6 +10,8 @@ An LSTM-based deep learning system that composes original music from MIDI traini
 ## Demo
 
 <img width="1918" height="841" alt="Screenshot 2026-05-17 233028" src="https://github.com/user-attachments/assets/bd1cff61-30e2-4901-8ad1-7a7f464e1b81" />
+<img width="1506" height="742" alt="Screenshot 2026-05-17 233037" src="https://github.com/user-attachments/assets/1c951cd4-33f3-4fa3-a620-1db6aa047264" />
+
 
 
 ## Features
