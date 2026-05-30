@@ -154,7 +154,10 @@ if "active_chapter" not in st.session_state:
 # Base directory & Model status
 base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, "music_model.h5")
+notes_path = os.path.join(base_dir, "notes.pkl")
 model_exists = os.path.exists(model_path)
+notes_exists = os.path.exists(notes_path)
+model_and_notes_exist = model_exists and notes_exists
 
 # ---------------------------------------------------------
 # SECTION 6 — SIDEBAR
@@ -172,9 +175,18 @@ st.sidebar.markdown("""
 nav_selection = st.sidebar.radio("Navigation", ["Create Music", "My Tracks", "About this AI"], label_visibility="collapsed")
 
 # Model Status Card
-status_dot = "🟢" if model_exists else "🟠"
-status_title = "AI model ready" if model_exists else "Model needs training"
-status_desc = "Trained and waiting for you" if model_exists else "Run python train.py first"
+if model_and_notes_exist:
+    status_dot = "🟢"
+    status_title = "AI model ready"
+    status_desc = "Trained and waiting for you"
+elif not notes_exists:
+    status_dot = "🟠"
+    status_title = "Needs preprocessing"
+    status_desc = "Run python preprocess.py first"
+else:
+    status_dot = "🟠"
+    status_title = "Model needs training"
+    status_desc = "Run python train.py first"
 
 st.sidebar.markdown(f"""
 <div style="background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 8px 24px rgba(124,101,239,0.08); margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.07);">
@@ -433,8 +445,11 @@ if nav_selection == "Create Music":
         </div>
         """, unsafe_allow_html=True)
         
-        if not model_exists:
-            st.warning("The AI needs to learn first. Ask your developer to run `python train.py` — it takes about an hour.")
+        if not model_and_notes_exist:
+            if not notes_exists:
+                st.warning("The notes vocabulary (notes.pkl) is missing. Please run preprocessing first (python preprocess.py).")
+            else:
+                st.warning("The AI model needs to learn first. Please run training first (python train.py) — it takes about an hour.")
             st.button("✦ Compose my music now", disabled=True, key="btn_c4_disabled")
         else:
             # We'll use a container with a custom class for the big button
