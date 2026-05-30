@@ -36,22 +36,26 @@ def plot_training_loss():
         return
         
     print("Plotting training loss chart...")
-    plt.figure(figsize=(10, 6))
-    plt.plot(epochs, losses, marker='o', linestyle='-', color='b', label='Training Loss')
-    plt.title("Model Training Loss History", fontsize=14)
-    plt.xlabel("Epoch", fontsize=12)
-    plt.ylabel("Loss", fontsize=12)
-    plt.grid(True, linestyle='--', alpha=0.6)
-    plt.legend()
-    
-    # Save the chart as loss_chart.png
-    output_image = os.path.join(base_dir, "loss_chart.png")
-    plt.savefig(output_image, dpi=300, bbox_inches='tight')
-    print(f"Saved loss chart to {output_image}")
-    
-    # Display it on screen
-    print("Displaying chart on screen. Close the window to continue.")
-    plt.show()
+    try:
+        plt.figure(figsize=(10, 6))
+        plt.plot(epochs, losses, marker='o', linestyle='-', color='b', label='Training Loss')
+        plt.title("Model Training Loss History", fontsize=14)
+        plt.xlabel("Epoch", fontsize=12)
+        plt.ylabel("Loss", fontsize=12)
+        plt.grid(True, linestyle='--', alpha=0.6)
+        plt.legend()
+        
+        # Save the chart as loss_chart.png
+        output_image = os.path.join(base_dir, "loss_chart.png")
+        plt.savefig(output_image, dpi=300, bbox_inches='tight')
+        print(f"Saved loss chart to {output_image}")
+        print("Success: Training loss plotted successfully!")
+        
+        # Display it on screen
+        print("Displaying chart on screen. Close the window to continue.")
+        plt.show()
+    except Exception as e:
+        print(f"Error plotting or displaying loss chart: {e}")
 
 if __name__ == '__main__':
     plot_training_loss()
