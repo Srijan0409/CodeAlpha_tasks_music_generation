@@ -9,6 +9,10 @@ An LSTM-based deep learning system that composes original music from MIDI traini
 
 Built for the **Code Alpha Internship — Task 3**.
 
+screenshot :
+<img width="1918" height="841" alt="Screenshot 2026-05-17 233028" src="https://github.com/user-attachments/assets/be03436f-3cb2-4a57-a223-b09bb001346b" />
+<img width="1506" height="742" alt="Screenshot 2026-05-17 233037" src="https://github.com/user-attachments/assets/909caebf-3cb6-411d-890b-a5eca82bb658" />
+
 ---
 
 ## ⚡ Quick Start
