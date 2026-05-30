@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.DS_Store
+*.h5
+*.pkl
+notes.pkl
+music_model.h5
+loss_history.csv
+*.wav
+*.mp3
+Thumbs.db
