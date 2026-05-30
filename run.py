@@ -8,7 +8,7 @@ def clear_screen():
 def print_header():
     header = """
 =================================================
-             COSMO MUSIC AI
+                 MELODY AI
 =================================================
 """
     print(header)
@@ -16,10 +16,16 @@ def print_header():
 def run_script(command, script_name):
     print(f"\nRunning {script_name}...")
     try:
-        subprocess.run(command, shell=True, check=True)
+        if isinstance(command, str):
+            subprocess.run(command, shell=True, check=True)
+        else:
+            subprocess.run(command, check=True)
         print("\nDone!")
     except subprocess.CalledProcessError:
         print(f"\nError: The script '{script_name}' failed to execute properly.")
+    except FileNotFoundError:
+        print(f"\nError: Could not find the executable to run '{script_name}'.")
+        print("Please check that your virtual environment is active and packages are installed.")
     except Exception as e:
         print(f"\nAn unexpected error occurred: {e}")
 
@@ -38,17 +44,18 @@ def main():
         choice = input("\nEnter your choice (1-6): ").strip()
         
         if choice == '1':
-            run_script(f"{sys.executable} preprocess.py", "preprocess.py")
+            run_script([sys.executable, "preprocess.py"], "preprocess.py")
         elif choice == '2':
-            run_script(f"{sys.executable} train.py", "train.py")
+            run_script([sys.executable, "train.py"], "train.py")
         elif choice == '3':
-            run_script(f"{sys.executable} generate.py", "generate.py")
+            run_script([sys.executable, "generate.py"], "generate.py")
         elif choice == '4':
-            run_script(f"{sys.executable} plot_loss.py", "plot_loss.py")
+            run_script([sys.executable, "plot_loss.py"], "plot_loss.py")
         elif choice == '5':
-            run_script(f"{sys.executable} -m streamlit run app.py", "app.py")
+            # Option 5 runs streamlit command list precisely
+            run_script(["streamlit", "run", "app.py"], "app.py")
         elif choice == '6':
-            print("\nExiting Cosmo Music AI. Goodbye!")
+            print("\nExiting Melody AI. Goodbye!")
             sys.exit(0)
         else:
             print("\nInvalid input! Please enter a number between 1 and 6.")
@@ -59,5 +66,5 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\n\nExiting Cosmo Music AI. Goodbye!")
+        print("\n\nExiting Melody AI. Goodbye!")
         sys.exit(0)
