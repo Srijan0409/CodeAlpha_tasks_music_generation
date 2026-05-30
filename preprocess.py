@@ -20,11 +20,18 @@ def get_notes():
     if not os.path.exists(midi_data_dir):
         print(f"Directory not found: {midi_data_dir}")
         print("Creating the directory. Please place some .mid files inside it and run again.")
-        os.makedirs(midi_data_dir, exist_ok=True)
+        try:
+            os.makedirs(midi_data_dir, exist_ok=True)
+        except Exception as e:
+            print(f"Error creating directory {midi_data_dir}: {e}")
         return
 
     midi_path = os.path.join(midi_data_dir, "*.mid")
-    files = glob.glob(midi_path)
+    try:
+        files = glob.glob(midi_path)
+    except Exception as e:
+        print(f"Error listing files in {midi_data_dir}: {e}")
+        return
     
     if len(files) == 0:
         print(f"Error: No MIDI files found in {midi_data_dir}.")
@@ -48,14 +55,15 @@ def get_notes():
                 notes_to_parse = midi.flat.notes
             
             # Extract notes and chords
-            for element in notes_to_parse:
-                if isinstance(element, note.Note):
-                    # Append single notes as string (e.g., "C4", "E3")
-                    notes.append(str(element.pitch))
-                elif isinstance(element, chord.Chord):
-                    # Append chords by joining note values (e.g., "4.7.11")
-                    notes.append('.'.join(str(n) for n in element.normalOrder))
-                    
+            if notes_to_parse:
+                for element in notes_to_parse:
+                    if isinstance(element, note.Note):
+                        # Append single notes as string (e.g., "C4", "E3")
+                        notes.append(str(element.pitch))
+                    elif isinstance(element, chord.Chord):
+                        # Append chords by joining note values (e.g., "4.7.11")
+                        notes.append('.'.join(str(n) for n in element.normalOrder))
+            
         except Exception as e:
             print(f"\nError parsing {file}: {e}")
             
@@ -71,10 +79,14 @@ def get_notes():
     
     # Save the notes to a pickle file
     notes_file = os.path.join(base_dir, "notes.pkl")
-    with open(notes_file, 'wb') as filepath:
-        pickle.dump(notes, filepath)
-        
-    print(f"\nnotes.pkl saved — {len(unique_notes)} unique notes found across {len(files)} files")
+    try:
+        with open(notes_file, 'wb') as filepath:
+            pickle.dump(notes, filepath)
+        print(f"\nnotes.pkl saved — {len(unique_notes)} unique notes found across {len(files)} files")
+        print("Success: Preprocessing completed successfully!")
+    except Exception as e:
+        print(f"Error saving notes.pkl: {e}")
+        raise e
 
 if __name__ == '__main__':
     try:
