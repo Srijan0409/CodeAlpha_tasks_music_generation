@@ -8,20 +8,11 @@ from music21 import instrument, note, stream, chord
 import argparse
 from model import create_network
 
-# Set up argument parser
-parser = argparse.ArgumentParser(description="Generate music with the trained model.")
-parser.add_argument("--temperature", type=float, default=1.0, help="Temperature / creativity control")
-parser.add_argument("--notes", type=int, default=500, help="Number of notes to generate")
-args = parser.parse_args()
-
-TEMPERATURE = args.temperature
-NOTE_COUNT = args.notes
-
-def generate_music():
+def generate_music(temperature=1.0, note_count=500):
     """ 
     Generate a new music sequence from the trained neural network.
     """
-    print(f"Starting music generation with TEMPERATURE = {TEMPERATURE}")
+    print(f"Starting music generation with TEMPERATURE = {temperature}, NOTES = {note_count}")
     base_dir = os.path.dirname(os.path.abspath(__file__))
     notes_file = os.path.join(base_dir, "notes.pkl")
     model_path = os.path.join(base_dir, "music_model.h5")
@@ -34,19 +25,31 @@ def generate_music():
         return 0
         
     print(f"Loading notes from {notes_file}...")
-    with open(notes_file, 'rb') as filepath:
-        notes = pickle.load(filepath)
+    try:
+        with open(notes_file, 'rb') as filepath:
+            notes = pickle.load(filepath)
+    except Exception as e:
+        print(f"Error loading notes.pkl: {e}")
+        return 0
         
     pitchnames = sorted(set(item for item in notes))
     n_vocab = len(set(notes))
     
     # Create the model architecture
     print("Rebuilding model architecture...")
-    model = create_network(n_vocab)
+    try:
+        model = create_network(n_vocab)
+    except Exception as e:
+        print(f"Error rebuilding model architecture: {e}")
+        return 0
     
     # Load the weights from the trained model
     print(f"Loading weights from {model_path}...")
-    model.load_weights(model_path)
+    try:
+        model.load_weights(model_path)
+    except Exception as e:
+        print(f"Error loading weights from {model_path}: {e}")
+        return 0
     
     # Prepare mapping functions
     note_to_int = dict((note, number) for number, note in enumerate(pitchnames))
@@ -56,9 +59,13 @@ def generate_music():
     network_input = []
     
     # Prepare inputs for starting sequence selection
-    for i in range(0, len(notes) - sequence_length, 1):
-        sequence_in = notes[i:i + sequence_length]
-        network_input.append([note_to_int[char] for char in sequence_in])
+    try:
+        for i in range(0, len(notes) - sequence_length, 1):
+            sequence_in = notes[i:i + sequence_length]
+            network_input.append([note_to_int[char] for char in sequence_in])
+    except Exception as e:
+        print(f"Error preparing input sequences: {e}")
+        return 0
         
     if not network_input:
         print("Error: Not enough notes in notes.pkl to create a sequence of length 100.")
@@ -66,48 +73,61 @@ def generate_music():
         return 0
         
     # Pick a random starting sequence from the training data
-    start_index = np.random.randint(0, len(network_input)-1)
-    pattern = network_input[start_index]
+    try:
+        start_index = np.random.randint(0, len(network_input)-1)
+        pattern = network_input[start_index]
+    except Exception as e:
+        print(f"Error selecting starting sequence: {e}")
+        return 0
     
     print("Random starting sequence selected.")
-    print(f"Generating {NOTE_COUNT} new notes by predicting one note at a time...")
+    print(f"Generating {note_count} new notes by predicting one note at a time...")
     
     prediction_output = []
     
     # Generate requested number of notes
-    for note_index in range(NOTE_COUNT):
-        # Format the input sequence for the model
-        prediction_input = np.reshape(pattern, (1, len(pattern), 1))
-        prediction_input = prediction_input / float(n_vocab)
-        
-        # Predict the next note
-        prediction = model.predict(prediction_input, verbose=0)
-        
-        # Apply temperature sampling instead of greedy np.argmax
-        prediction = prediction[0] / TEMPERATURE
-        prediction = prediction - np.max(prediction) # For numerical stability
-        prediction = np.exp(prediction) / np.sum(np.exp(prediction))
-        prediction = prediction / np.sum(prediction) # Ensure probabilities sum precisely to 1
-        index = np.random.choice(len(prediction), p=prediction)
-        
-        # Map predicted integer back to note/chord string
-        result = int_to_note[index]
-        prediction_output.append(result)
-        
-        # Feed the output back as input by sliding the window
-        pattern.append(index)
-        pattern = pattern[1:len(pattern)]
-        
-        if (note_index + 1) % 50 == 0:
-            print(f"Generated {note_index + 1}/{NOTE_COUNT} notes...")
+    try:
+        for note_index in range(note_count):
+            # Format the input sequence for the model
+            prediction_input = np.reshape(pattern, (1, len(pattern), 1))
+            prediction_input = prediction_input / float(n_vocab)
+            
+            # Predict the next note
+            prediction = model.predict(prediction_input, verbose=0)
+            
+            # Apply temperature sampling instead of greedy np.argmax
+            prediction = prediction[0] / temperature
+            prediction = prediction - np.max(prediction) # For numerical stability
+            prediction = np.exp(prediction) / np.sum(np.exp(prediction))
+            prediction = prediction / np.sum(prediction) # Ensure probabilities sum precisely to 1
+            index = np.random.choice(len(prediction), p=prediction)
+            
+            # Map predicted integer back to note/chord string
+            result = int_to_note[index]
+            prediction_output.append(result)
+            
+            # Feed the output back as input by sliding the window
+            pattern.append(index)
+            pattern = pattern[1:len(pattern)]
+            
+            if (note_index + 1) % 50 == 0:
+                print(f"Generated {note_index + 1}/{note_count} notes...")
+    except Exception as e:
+        print(f"Error during sequence prediction: {e}")
+        return 0
             
     print("Generation complete. Converting sequence to MIDI file...")
-    create_midi(prediction_output, base_dir)
+    try:
+        create_midi(prediction_output, base_dir)
+    except Exception as e:
+        print(f"Error saving generated MIDI data: {e}")
+        return 0
     
     # Calculate estimated duration (0.5 quarter notes per generated note @ 120bpm = 0.25 seconds per note)
-    estimated_minutes = round((NOTE_COUNT * 0.25) / 60, 2)
-    print(f"\noutput.mid saved — {NOTE_COUNT} notes generated (~{estimated_minutes} minutes of music)")
-    return NOTE_COUNT
+    estimated_minutes = round((note_count * 0.25) / 60, 2)
+    print(f"\noutput.mid saved — {note_count} notes generated (~{estimated_minutes} minutes of music)")
+    print("Success: Music generation completed successfully!")
+    return note_count
 
 def create_midi(prediction_output, base_dir):
     """ 
@@ -165,9 +185,14 @@ def create_midi(prediction_output, base_dir):
         print("Note: FluidSynth requires the fluidsynth system executable and a soundfont.")
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Generate music with the trained model.")
+    parser.add_argument("--temperature", type=float, default=1.0, help="Temperature / creativity control")
+    parser.add_argument("--notes", type=int, default=500, help="Number of notes to generate")
+    args = parser.parse_args()
+
     try:
         start_time = time.time()
-        generate_music()
+        generate_music(temperature=args.temperature, note_count=args.notes)
         elapsed = int(time.time() - start_time)
         print(f"Completed in {elapsed // 60} minutes {elapsed % 60} seconds")
     except Exception as e:
