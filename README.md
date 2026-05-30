@@ -1,112 +1,169 @@
-# Cosmo Music AI
+# Melody AI — Music Generation AI
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15+-orange.svg)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.30+-red.svg)
+![Python](https://img.shields.io/badge/Python-3.9--3.12-blue.svg)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.21.0-orange.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.57.0-red.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-An LSTM-based deep learning system that composes original music from MIDI training data, with a space-themed Streamlit web interface.
+An LSTM-based deep learning system that composes original music from MIDI training data, with a clean, animated, modern Streamlit web interface. 
 
-## Demo
+Built for the **Code Alpha Internship — Task 3**.
 
-<img width="1918" height="841" alt="Screenshot 2026-05-17 233028" src="https://github.com/user-attachments/assets/bd1cff61-30e2-4901-8ad1-7a7f464e1b81" />
-<img width="1506" height="742" alt="Screenshot 2026-05-17 233037" src="https://github.com/user-attachments/assets/1c951cd4-33f3-4fa3-a620-1db6aa047264" />
+---
 
+## ⚡ Quick Start
 
+The fastest way to get started is by using the automation scripts:
 
-## Features
+1. **Clone the repository and open the project folder:**
+   ```bash
+   git clone https://github.com/USERNAME/music-generation-ai.git
+   cd music-generation-ai
+   ```
 
-* ✅ Trains on real MIDI music files (classical, jazz, ambient)
-* ✅ LSTM neural network with 512 units per layer
-* ✅ Temperature-controlled creativity slider
-* ✅ Space-themed animated Streamlit web UI
-* ✅ Real-time training loss chart
-* ✅ One-click MIDI and WAV download
-* ✅ Beginner-friendly — no music knowledge needed
+2. **Run the installation setup script:**
+   * **Windows:** Double-click `setup.bat` or run:
+     ```bash
+     setup.bat
+     ```
+   * **Mac/Linux:** Run:
+     ```bash
+     bash setup.sh
+     ```
 
-## How it works
+3. **Add your MIDI files:**
+   Place some classical, jazz, or pop `.mid` files inside the `midi_data/` folder. (A few sample MIDI files are pre-loaded to get you started!)
 
-**1. Data Processing**
-The system first reads raw MIDI files placed in the `midi_data` folder. It extracts the musical notes and chords from these files, mapping each unique sound to a numeric integer so the neural network can understand them.
+4. **Launch the interactive menu:**
+   ```bash
+   python run.py
+   ```
+   From the CLI menu, you can run the entire pipeline: preprocess MIDI data, train the model, plot training loss, and launch the web UI.
 
-**2. Sequence Generation**
-The numeric notes are grouped into fixed-length sequences. The network is trained to look at a sequence of notes (for instance, the first 100 notes of a song) and predict the single note that should come next.
+---
 
-**3. Model Training**
-An LSTM (Long Short-Term Memory) neural network processes these sequences. LSTMs are specifically designed to remember long-term patterns, making them ideal for learning the structure, rhythm, and melody of the training music over multiple epochs.
+> [!NOTE]
+> **Repository File Status:** The files `notes.pkl` and `music_model.h5` are not included in the repository because they are generated dynamically and can be large. Run `preprocess.py` then `train.py` (via `run.py` or manually) to generate them.
 
-**4. Music Generation**
-Once trained, the model is given a random starting sequence or "seed". It predicts the next note, appends it to the sequence, and repeats this process to generate an entirely new stream of music based on the learned patterns.
+---
 
-**5. Output Conversion**
-Finally, the newly generated sequence of numeric integers is converted back into real musical notes and chords. The system saves this output as a standard MIDI file, which can be played on any media player or converted into WAV format.
+## 🎨 Features
 
-## Project Structure
+* **✅ Automatic Preprocessing:** Extracts notes and chords from raw MIDI files in the `midi_data/` folder.
+* **✅ Deep Learning Architecture:** LSTM recurrent neural network with 512 units to capture long-term musical dependencies.
+* **✅ Advanced Temperature Control:** Creativity slider in the UI to control randomness (from safe/familiar notes to wild, experimental compositions).
+* **✅ Modern Web UI:** Beautifully styled, responsive Streamlit dashboard with custom CSS, micro-animations, progress trackers, and visual metric cards.
+* **✅ Live Loss Visualization:** Generates charts to track model loss history and training progress.
+* **✅ Easy Download:** One-click downloads for MIDI (`.mid`) files and WAV audio tracks.
+
+---
+
+## 🧠 How It Works (The 5-Step Pipeline)
+
+1. **MIDI Preprocessing:** The script parses classical or jazz `.mid` files in the `midi_data/` directory. It extracts note pitches (e.g., "C4") and chords (e.g., "E3.G3") and maps them to unique integers.
+2. **Sequence Packaging:** The numeric representations are structured into overlapping training sequences using a sliding window of 100 notes.
+3. **Recurrent Training:** An LSTM (Long Short-Term Memory) neural network reads these sequences and is trained to predict the next note in the sequence. It minimizes categorical cross-entropy loss over 100 epochs.
+4. **Improvisational Prediction:** Using a random seed sequence from the training data, the model predicts notes one by one, feeding its own predictions back as input. Temperature sampling is applied to control the creative variance of predictions.
+5. **MIDI Reconstruction:** The generated integer predictions are mapped back into `music21` notes and chords, offset by durations, and compiled into a new MIDI file.
+
+---
+
+## 📂 Project Folder Structure
 
 ```text
 music_generation_ai/
 │
-├── midi_data/              # Folder to place your training MIDI files
-├── app.py                  # Streamlit web dashboard and UI
-├── generate.py             # Script to generate new music using the trained model
-├── model.py                # Defines the LSTM neural network architecture
-├── plot_loss.py            # Generates charts to visualize model training progress
-├── preprocess.py           # Parses MIDI files and extracts notes/chords
-├── requirements.txt        # Python library dependencies
-├── run.py                  # Interactive CLI menu to run the whole pipeline
-├── setup.bat               # Automated installer script for Windows
-├── setup.sh                # Automated installer script for Mac/Linux
-├── train.py                # Script to train the neural network
-└── README.md               # Project documentation
+├── midi_data/              # Directory containing MIDI files for training
+├── sample_output/          # Pre-generated MIDI samples for review (contains sample_1.mid)
+├── venv/                   # Python virtual environment (gitignored)
+├── .gitignore              # Git ignore rules for virtualenv, models, and temp files
+├── README.md               # Project documentation (this file)
+├── requirements.txt        # Pinned Python package dependencies
+├── setup.bat               # Automated environment installer for Windows
+├── setup.sh                # Automated environment installer for Mac/Linux
+├── run.py                  # Interactive CLI menu launcher
+│
+├── preprocess.py           # Parses MIDI and saves note vocabulary
+├── model.py                # Defines the LSTM network structure
+├── train.py                # Trains the neural network on processed notes
+├── generate.py             # Generates new music files using trained model weights
+├── plot_loss.py            # Generates loss curve visualization charts
+├── app.py                  # Streamlit web user interface
+│
+├── notes.pkl               # Extracted note vocabulary file (gitignored, generated by preprocess.py)
+├── music_model.h5          # Trained model weight checkpoints (gitignored, generated by train.py)
+└── loss_history.csv        # Logged loss data per training epoch (gitignored, generated by train.py)
 ```
 
-## Quick Start
+---
 
-**Step 1:** Clone or download the project
-**Step 2:** Run `setup.bat` (Windows) or `bash setup.sh` (Mac/Linux)
-**Step 3:** Add your MIDI files to the `midi_data/` folder
-**Step 4:** Run `python run.py` and follow the interactive menu
+## 🛠️ Manual Setup
 
-## Manual Setup
+If you prefer to set up the environment manually without using the scripts:
 
-For advanced users who prefer to set up the environment manually:
+1. **Create and activate a virtual environment:**
+   ```bash
+   python -m venv venv
+   # Windows
+   .\venv\Scripts\activate
+   # Mac/Linux
+   source venv/bin/activate
+   ```
 
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+2. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-# 2. Preprocess the MIDI files
-python preprocess.py
+3. **Preprocess MIDI files:**
+   ```bash
+   python preprocess.py
+   ```
 
-# 3. Train the model
-python train.py
+4. **Train the network:**
+   ```bash
+   python train.py
+   ```
 
-# 4. Generate new music
-python generate.py
+5. **Generate a new MIDI sequence:**
+   ```bash
+   python generate.py --temperature 1.0 --notes 500
+   ```
 
-# 5. Launch the Web UI
-streamlit run app.py
-```
+6. **Launch the Streamlit web dashboard:**
+   ```bash
+   streamlit run app.py
+   ```
 
-## Technologies
+---
 
-| Tool | Version | Purpose |
+## 💻 Technologies Used
+
+| Library / Tool | Version | Purpose |
 | --- | --- | --- |
-| Python | 3.9+ | Core programming language |
-| TensorFlow / Keras | 2.15+ | Deep learning framework for the LSTM model |
-| Streamlit | 1.30+ | Building the interactive web user interface |
-| Music21 | 9.1+ | Parsing and manipulating MIDI music data |
-| Matplotlib | 3.8+ | Plotting and visualizing training loss curves |
+| **Python** | 3.9 - 3.12 | Core programming language |
+| **TensorFlow** | 2.21.0 | Core framework to build, train, and run the LSTM network |
+| **Streamlit** | 1.57.0 | Building and deploying the interactive web application UI |
+| **Music21** | 9.9.2 | Toolkit for parsing, writing, and handling MIDI music files |
+| **NumPy** | 2.4.4 | High-performance array operations for sequences and probabilities |
+| **Matplotlib** | 3.10.9 | Generating training loss history charts |
+| **Pandas** | 3.0.3 | CSV history logging and file management helper |
+| **tqdm** | 4.67.3 | Terminal progress indicators during preprocessing and training |
+| **midi2audio** | 0.1.1 | (Optional) Synthesizes MIDI to WAV using FluidSynth |
 
-## Sample Output
+---
 
-The generated music is output as a `.mid` (MIDI) file. The output typically mimics the style of the training data—for instance, if trained on classical piano pieces, the generated music will feature complex, flowing piano melodies. You can play this `.mid` file using almost any standard media player (like Windows Media Player or VLC), import it into a Digital Audio Workstation (DAW) like FL Studio or Logic Pro to apply high-quality software instruments, or download it directly as a WAV file from the Streamlit web interface.
+## 🎵 Sample Output
 
-## About This Project
+* Check out the pre-generated output midi sample in the `sample_output/` folder:
+  * [sample_1.mid](file:///d:/Projects/CodeAlpha/music_generation_ai/sample_output/sample_1.mid)
+* The model produces beautiful, expressive piano patterns matching the mood and structural parameters configured. These files can be played on any midi-compliant software or imported into a DAW (e.g., GarageBand, FL Studio, Logic Pro) to apply professional instrument synthesizers.
 
-Built as Task 3 of the Code Alpha Internship Program. Demonstrates applied deep learning for generative AI in music.
+---
 
-## Author & License
-
-Developed for the Code Alpha Internship.
-This project is licensed under the MIT License.
+## 🎓 About the Program
+* **Internship Provider:** Code Alpha
+* **Project Name:** Music Generation AI
+* **Internship Task:** Task 3
+* **Author:** Srijan Sahu
+* **License:** MIT License
