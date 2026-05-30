@@ -1,8 +1,8 @@
-music21
-tensorflow
-numpy
-matplotlib
-midi2audio
-streamlit
-pandas
-tqdm
+music21==9.9.2
+tensorflow==2.21.0
+numpy==2.4.4
+matplotlib==3.10.9
+midi2audio==0.1.1
+streamlit==1.57.0
+pandas==3.0.3
+tqdm==4.67.3
